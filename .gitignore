@@ -55,5 +55,3 @@ genie-??????
 !test/data/fa/*
 !test/data/thingpedia.tt
 !test/thingpedia.tt
-
-tool/autoqa/wikidata/data
