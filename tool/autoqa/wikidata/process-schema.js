@@ -36,6 +36,10 @@ import {
     getRangeConstraint,
     getSchemaorgEquivalent,
     getClasses,
+    getPropertyList,
+    getItemLabel,
+    getPropertyLabel,
+    getPropertyAltLabels,
     getType,
     getElementType,
     argnameFromLabel,
@@ -261,7 +265,7 @@ class SchemaProcessor {
             for (let property of properties) {
                 const label = await getPropertyLabel(property);
                 const name = argnameFromLabel(label);
-                const type = await getType(domain, domainLabel, property, label, this._schemaorgProperties, this._paramDatasets);
+                const type = await getType(domain, domainLabel, property, label, this._schemaorgProperties, this._paramDatasets, true);
                 const annotations = {
                     nl: { canonical: await this._getArgCanonical(property, label, type) },
                     impl: { wikidata_id: new Ast.Value.String(property) }
