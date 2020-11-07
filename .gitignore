@@ -27,8 +27,10 @@ po/*.json
 
 workdir*
 genienlp/
+.embeddings/
 
 env/
+.env/
 
 # test dirs
 genie-??????
