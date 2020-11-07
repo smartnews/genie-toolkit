@@ -311,7 +311,7 @@ export function initArgparse(subparsers) {
     });
     parser.add_argument('--template', {
         nargs: '+',
-        default: [path.resolve(path.dirname(module.filename), '../languages/thingtalk/en/dialogue.genie')],
+        default: [path.resolve(path.dirname(module.filename), '../../languages-dist/thingtalk/en/dialogue.genie')],
         help: 'Path to file containing construct templates, in Genie syntax.'
     });
     parser.add_argument('--entities', {
