@@ -32,6 +32,7 @@ import * as StreamUtils from '../lib/utils/stream-utils';
 import * as Utils from '../lib/utils/misc-utils';
 import { EntityMap } from '../lib/utils/entity-utils';
 import * as ThingTalkUtils from '../lib/utils/thingtalk';
+import * as I18n from "../lib/i18n";
 
 interface CacheEntry {
     from : string;
@@ -74,8 +75,11 @@ class TypecheckStream extends Stream.Transform {
     private _cache : Map<string, CacheEntry>;
     private _cacheOut : Stream.Writable|undefined;
     private _droppedOut : Stream.Writable;
+    private _langPack : I18n.LanguagePack;
+    private _tokenizer : I18n.BaseTokenizer;
     private _interactive : boolean;
     private _strict : boolean;
+    private _tokenized : boolean;
     private _rl ?: readline.Interface;
 
     private _current : SentenceExample|undefined;
@@ -87,7 +91,7 @@ class TypecheckStream extends Stream.Transform {
                 cache : Map<string, CacheEntry>,
                 cacheOut : Stream.Writable|undefined,
                 droppedOut : Stream.Writable,
-                args : { interactive : boolean, strict : boolean, locale : string }) {
+                args : { interactive : boolean, strict : boolean, locale : string, tokenized : boolean }) {
         super({ objectMode: true });
 
         this._locale = args.locale;
@@ -97,6 +101,9 @@ class TypecheckStream extends Stream.Transform {
         this._cacheOut = cacheOut;
         this._droppedOut = droppedOut;
 
+        this._langPack = I18n.get(this._locale);
+        this._tokenizer = this._langPack.getTokenizer();
+
         this._interactive = args.interactive;
         if (args.interactive) {
             this._rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -104,6 +111,7 @@ class TypecheckStream extends Stream.Transform {
             this._rl.on('line', (line) => this._onLine(line));
         }
         this._strict = args.strict;
+        this._tokenized = args.tokenized;
 
         this._current = undefined;
         this._entities = undefined;
@@ -197,6 +205,9 @@ class TypecheckStream extends Stream.Transform {
                 thingpediaClient: this._tpClient,
                 schemaRetriever: this._schemas,
             }, true);
+
+            if (!this._tokenized)
+                this._current.preprocessed = this._tokenizer.tokenize(this._current.preprocessed).rawTokens.join(' ');
 
             ex.target_code = ThingTalkUtils.serializePrediction(program!, this._current!.preprocessed, this._entities, {
                 locale: this._locale
@@ -328,6 +339,18 @@ export function initArgparse(subparsers : argparse.SubParser) {
     parser.add_argument('--random-seed', {
         default: 'almond is awesome',
         help: 'Random seed'
+    });
+    parser.add_argument('--tokenized', {
+        required: false,
+        action: 'store_true',
+        default: true,
+        help: "The dataset is already tokenized (this is the default)."
+    });
+    parser.add_argument('--no-tokenized', {
+        required: false,
+        dest: 'tokenized',
+        action: 'store_false',
+        help: "The dataset is not already tokenized."
     });
 }
 
