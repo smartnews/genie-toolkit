@@ -33,6 +33,7 @@ import * as Utils from '../lib/utils/misc-utils';
 import { EntityMap } from '../lib/utils/entity-utils';
 import * as ThingTalkUtils from '../lib/utils/thingtalk';
 import * as I18n from "../lib/i18n";
+import * as EntityUtils from "../lib/utils/entity-utils";
 
 interface CacheEntry {
     from : string;
@@ -206,8 +207,12 @@ class TypecheckStream extends Stream.Transform {
                 schemaRetriever: this._schemas,
             }, true);
 
+            const preserved_tokens : string[] = Object.keys(EntityUtils.ENTITIES);
+            preserved_tokens.push('GENERIC_ENTITY');
+            const preserved_regex = new RegExp(preserved_tokens.join("|"));
+
             if (!this._tokenized)
-                this._current.preprocessed = this._tokenizer.tokenize(this._current.preprocessed).rawTokens.join(' ');
+                this._current.preprocessed = this._tokenizer.tokenize(this._current.preprocessed, preserved_regex).rawTokens.join(' ');
 
             ex.target_code = ThingTalkUtils.serializePrediction(program!, this._current!.preprocessed, this._entities, {
                 locale: this._locale

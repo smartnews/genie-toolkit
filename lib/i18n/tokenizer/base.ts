@@ -530,7 +530,7 @@ export default class BaseTokenizer {
         });
     }
 
-    tokenize(text : string) : TokenizerResult {
+    tokenize(text : string, preserved ?: RegExp) : TokenizerResult {
         // apply compatibility normalizations of certain exotic Unicode characters, and split out
         // combining characters
         text = text.normalize('NFKD');
@@ -543,7 +543,12 @@ export default class BaseTokenizer {
 
         let token : Token|(typeof Lexer.EOF);
         while ((token = this._realLexer.lex()) !== Lexer.EOF) {
-            rawTokens.push(token.normalized);
+
+            if (preserved?.test(token.raw))
+                rawTokens.push(token.raw);
+            else
+                rawTokens.push(token.normalized);
+
             if (token.type) {
                 let assigned = assignments[token.type];
                 if (!assigned)

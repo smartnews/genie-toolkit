@@ -26,7 +26,7 @@ export type EntityMap = Syntax.EntityMap;
 
 const MAX_SMALL_INTEGER = 12;
 
-const ENTITIES : { [key : string] : (idx : number) => AnyEntity } = {
+export const ENTITIES : { [key : string] : (idx : number) => AnyEntity } = {
     DURATION: (idx) => ({ value: idx + 2, unit: 'ms' }),
     NUMBER: (idx) => idx + MAX_SMALL_INTEGER + 1,
     DATE: (idx) => ({ day: idx + 2, month: 1, year: 2018 }),
