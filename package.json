@@ -47,6 +47,7 @@
     "qs": "^6.7.0",
     "query-validation": "^0.2.0",
     "seedrandom": "^3.0.0",
+    "semver": "^5.7.1",
     "sockaddr": "^1.0.1",
     "sqlite3": "^5.0.0",
     "stemmer": "^1.0.5",
