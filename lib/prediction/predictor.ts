@@ -134,10 +134,12 @@ class Worker extends events.EventEmitter {
                     if (instance.candidates) {
                         return instance.candidates;
                     } else {
-                        // no beam search, hence only one candidate, and fixed score
+                        // no beam search, hence only one candidate
+                        // the score might present or not, depending on whether
+                        // we calibrate or not
                         return [{
                             answer: instance.answer,
-                            score: 1
+                            score: typeof instance.score === 'number' ? instance.score : 1
                         }];
                     }
                 }));
